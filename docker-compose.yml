@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:3001
+    depends_on:
+      - backend
+    networks:
+      - cika-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/cika-chat
+      - FRONTEND_URL=http://localhost
+    depends_on:
+      - mongo
+    networks:
+      - cika-network
+
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - cika-network
+
+volumes:
+  mongo_data:
+
+networks:
+  cika-network:
+    driver: bridge
